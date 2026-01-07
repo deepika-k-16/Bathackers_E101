@@ -1,0 +1,314 @@
+Project Name
+
+GrowGuide – Resource-Aware Growth & Collaboration Platform for Small Vendors
+
+Goal
+
+Build a full-stack web application that helps small vendors grow and expand using logic-driven, explainable, resource-aware decision-making, instead of paid advertising or black-box AI.
+
+The system must use algorithmic AI (rule-based + optimization), not ML training.
+
+Tech Stack (STRICT)
+
+Frontend: React + Vite + Tailwind CSS
+
+Backend: Python (Flask)
+
+Database: SQLite (file-based, no external DB)
+
+ORM: SQLAlchemy
+
+No ML models
+
+No paid ad APIs
+
+No auto-posting
+
+Core Principle (VERY IMPORTANT)
+
+AI does NOT decide everything.
+AI guides decisions using rules, scores, and constraints.
+Humans remain in control.
+
+USER FLOW
+1️⃣ Signup / Login
+
+Vendor logs in and provides:
+
+Business name
+
+Business category
+
+Target audience (local / young / general)
+
+Budget (zero / low / medium)
+
+Time availability (hours per week)
+
+Growth goal (visibility / sales / expansion)
+
+Optional: business images & Instagram profile link
+
+2️⃣ Resource Mapping (Algorithm 1)
+
+Convert inputs into numeric scores:
+
+Budget
+
+zero → 0
+
+low → 1
+
+medium → 2
+
+Time availability
+
+< 5 hrs → 0
+
+5–10 hrs → 1
+
+> 10 hrs → 2
+
+Growth Capacity (GC)
+
+GC = budget_score + time_score
+
+3️⃣ Growth Strategy Decision
+
+(Algorithm 2 – Constraint-Aware Logic)
+
+Rule-based logic:
+
+If GC ≤ 1
+
+No paid ads
+
+Recommend collaboration
+
+Organic posting (2 posts/week)
+
+If GC = 2 or 3
+
+Organic promotion
+
+Posting 3–5 times/week
+
+If GC ≥ 4
+
+Suggest paid + organic (suggest only)
+
+For each action, output:
+
+What to do
+
+What to avoid
+
+Clear reason
+
+4️⃣ Platform Recommendation
+
+(Algorithm 3 – Weighted Rules)
+
+Rules:
+
+Instagram → visual + young audience
+
+WhatsApp → local repeat customers
+
+Marketplace → product-based discovery
+
+Factors:
+
+Audience fit
+
+Content ability
+
+Time constraint
+
+5️⃣ Content Guidance (AI-Assisted Only)
+
+AI is used only for:
+
+Caption suggestions
+
+Hashtag suggestions
+
+Human-friendly explanations
+
+Features:
+
+Copy caption
+
+Copy hashtags
+
+Select uploaded image
+
+Preview post
+
+Optional redirect to Instagram (manual posting)
+
+❌ No auto-posting
+
+6️⃣ Vendor Matching
+
+(Algorithm 4 – Complementarity Based)
+
+Match vendors based on:
+
+Same audience
+
+Different business category
+
+Same growth goal
+
+Score:
+
+match_score = audience_match + category_complement + goal_match
+
+
+Recommend top 3 vendors where score ≥ 2
+
+Explain why the match is suggested
+
+Avoid competitors
+
+7️⃣ Collaboration Feature
+
+Vendors can send collaboration requests
+
+Each request includes:
+
+From vendor
+
+To vendor
+
+Reason for collaboration
+
+Status (open / accepted / rejected)
+
+8️⃣ Expansion / Fundraising Feature
+
+Vendor can post:
+
+“I want to expand and need support”
+
+Includes:
+
+Expansion pitch
+
+Support type (partner / promotion)
+
+Status (open / closed)
+
+Other vendors can:
+
+View requests
+
+Express interest
+
+❌ No payments
+❌ No third-party fundraising APIs
+
+BACKEND REQUIREMENTS (SQLITE)
+SQLite Tables (via SQLAlchemy)
+
+vendors
+
+recommendations
+
+collaboration_requests
+
+expansion_requests
+
+Backend Logic Files (MANDATORY)
+
+resource_model.py
+
+Convert budget & time to numeric scores
+
+optimizer.py
+
+Select actions using
+
+benefit / (cost + time + 1)
+
+
+matcher.py
+
+Vendor matching logic
+
+decision_engine.py
+
+Combines all algorithms
+
+models.py
+
+SQLAlchemy table definitions
+
+app.py
+
+Flask routes and API endpoints
+
+FRONTEND PAGES (MUST BUILD)
+
+Landing page
+
+Login / Signup
+
+Vendor setup form
+
+Dashboard (shows logic output)
+
+Collaboration page
+
+Expansion requests page
+
+Logout support
+
+UI REQUIREMENTS
+
+Professional, minimal UI
+
+Card-based layout
+
+Show WHY decisions are made
+
+No flashy animations
+
+HOW AI IS USED (JUDGE SAFE)
+
+Explaining decisions
+
+Generating captions
+
+Making logic human-readable
+
+❌ No prediction
+❌ No training
+❌ No black-box models
+
+FINAL POSITIONING
+
+This system is:
+
+Logic-driven AI
+
+Constraint-aware growth planner
+
+Human-understandable decision engine
+
+Community-driven expansion platform
+
+OUTPUT EXPECTATION
+
+Generate:
+
+Fully working React frontend
+
+Fully working Flask backend
+
+SQLite database with sample data
+
+Clear code comments
+
+Demo-ready application
