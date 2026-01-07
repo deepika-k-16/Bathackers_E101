@@ -1,18 +1,143 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// === TABLE DEFINITIONS ===
+
+export const vendors = pgTable("vendors", {
+  id: serial("id").primaryKey(),
+  businessName: text("business_name").notNull(),
+  businessCategory: text("business_category").notNull(), // e.g. "clothing", "food", "services"
+  targetAudience: text("target_audience").notNull(), // "local", "young", "general"
+  budget: text("budget").notNull(), // "zero", "low", "medium"
+  timeAvailability: text("time_availability").notNull(), // "< 5 hrs", "5-10 hrs", "> 10 hrs"
+  growthGoal: text("growth_goal").notNull(), // "visibility", "sales", "expansion"
+  instagramUrl: text("instagram_url"),
+  bio: text("bio"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const collaborationRequests = pgTable("collaboration_requests", {
+  id: serial("id").primaryKey(),
+  fromVendorId: integer("from_vendor_id").notNull(),
+  toVendorId: integer("to_vendor_id").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("open"), // "open", "accepted", "rejected"
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export const expansionRequests = pgTable("expansion_requests", {
+  id: serial("id").primaryKey(),
+  vendorId: integer("vendor_id").notNull(),
+  pitch: text("pitch").notNull(),
+  supportType: text("support_type").notNull(), // "partner", "promotion"
+  status: text("status").notNull().default("open"), // "open", "closed"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// === RELATIONS ===
+
+export const collaborationRequestsRelations = relations(collaborationRequests, ({ one }) => ({
+  fromVendor: one(vendors, {
+    fields: [collaborationRequests.fromVendorId],
+    references: [vendors.id],
+    relationName: "fromVendor",
+  }),
+  toVendor: one(vendors, {
+    fields: [collaborationRequests.toVendorId],
+    references: [vendors.id],
+    relationName: "toVendor",
+  }),
+}));
+
+export const expansionRequestsRelations = relations(expansionRequests, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [expansionRequests.vendorId],
+    references: [vendors.id],
+  }),
+}));
+
+// === BASE SCHEMAS ===
+
+export const insertVendorSchema = createInsertSchema(vendors).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertCollaborationRequestSchema = createInsertSchema(collaborationRequests).omit({ 
+  id: true, 
+  status: true,
+  createdAt: true 
+});
+
+export const insertExpansionRequestSchema = createInsertSchema(expansionRequests).omit({ 
+  id: true, 
+  status: true,
+  createdAt: true 
+});
+
+// === EXPLICIT API CONTRACT TYPES ===
+
+export type Vendor = typeof vendors.$inferSelect;
+export type InsertVendor = z.infer<typeof insertVendorSchema>;
+export type CreateVendorRequest = InsertVendor;
+export type UpdateVendorRequest = Partial<InsertVendor>;
+
+export type CollaborationRequest = typeof collaborationRequests.$inferSelect;
+export type InsertCollaborationRequest = z.infer<typeof insertCollaborationRequestSchema>;
+export type CreateCollaborationRequest = InsertCollaborationRequest;
+
+export type ExpansionRequest = typeof expansionRequests.$inferSelect;
+export type InsertExpansionRequest = z.infer<typeof insertExpansionRequestSchema>;
+export type CreateExpansionRequest = InsertExpansionRequest;
+
+// Algo output types
+export interface ResourceScore {
+  budgetScore: number;
+  timeScore: number;
+  growthCapacity: number;
+}
+
+export interface GrowthStrategyAction {
+  action: string;
+  avoid: string;
+  reason: string;
+}
+
+export interface GrowthStrategy {
+  score: ResourceScore;
+  strategyName: string; // e.g. "Organic posting", "Paid + Organic"
+  actions: GrowthStrategyAction[];
+}
+
+export interface PlatformRecommendation {
+  platform: string; // "Instagram", "WhatsApp", "Marketplace"
+  reason: string;
+  suitabilityScore: number;
+}
+
+export interface ContentGuidanceRequest {
+  topic: string;
+  platform: string;
+  tone?: string;
+}
+
+export interface ContentGuidanceResponse {
+  caption: string;
+  hashtags: string[];
+  explanation: string;
+}
+
+export interface VendorMatch {
+  vendor: Vendor;
+  matchScore: number;
+  reasons: string[];
+}
+
+export interface DashboardData {
+  vendor: Vendor;
+  resourceScore: ResourceScore;
+  growthStrategy: GrowthStrategy;
+  platformRecommendations: PlatformRecommendation[];
+}
