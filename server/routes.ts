@@ -3,7 +3,8 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { OpenAI } from "openai";
+import OpenAI from "openai";
+
 
 // === LOGIC ENGINE (Ported from Spec) ===
 
@@ -209,7 +210,13 @@ export async function registerRoutes(
   app.post(api.ai.generateContent.path, async (req, res) => {
     try {
       const { topic, platform, tone } = req.body;
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const openai = new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+  defaultHeaders: {
+    "HTTP-Referer": "http://localhost:5050",
+    "X-Title": "GrowGuide"
+  }
+});
 
       const prompt = `
         Act as a social media expert for small vendors. 
@@ -223,7 +230,7 @@ export async function registerRoutes(
       `;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "openai/gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" }
       });

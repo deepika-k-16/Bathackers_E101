@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
+import PublicProfile from "@/pages/PublicProfile";
 
 // Pages
 import Landing from "@/pages/Landing";
@@ -22,6 +23,7 @@ function Router() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/collaboration" component={Collaboration} />
         <Route path="/expansion" component={Expansion} />
+        <Route path="/profile/:vendorId" component={PublicProfile} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
